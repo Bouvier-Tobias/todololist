@@ -1,36 +1,78 @@
-const todoInput = document.getElementById('todo-input')
-const addButton = document.getElementById('todo-button')
-const todoList = document.getElementById('todo-list')
+const todoInput = document.getElementById("todo-input");
+const addTaskButton = document.getElementById("add-task");
+const todoList = document.getElementById("todo-list");
 
-addButton.addEventListener('click', addTask)
-todoList.addEventListener('click', deleteModifyCheck)
+addTaskButton.addEventListener("click", addTask);
+todoList.addEventListener("click", deleteModifyCheck);
 
-function addTask(event){
-    event.preventDefault();
+function addTask(event) {
+  event.preventDefault();
 
-    const blockTask = document.createElement('div');
-    blockTask.classList.add('block-task');
+  const valuetodoInput = todoInput.value.trim();
 
-    const taskText = document.createElement('li');
-    taskText.textContent = todoInput.value;
-    taskText.classList.add('li');
-    blockTask.appendChild(taskText);
+  const taskBlock = document.createElement("div");
+  taskBlock.classList.add("task-block");
 
-    const checkButton = document.createElement("button");
-    checkButton.textContent('add');
-    checkButton.classList.add('check-button');
-    blockTask.appendChild(checkButton);
+  const taskText = document.createElement("li");
+  taskText.textContent = valuetodoInput;
+  taskBlock.appendChild(taskText);
 
-    const trashButton = document.createElement('button');
-    trashButton.textContent('Trash');
-    trashButton.classList.add('trash-button');
-    blockTask.appendChild(trashButton);
+  const checkButton = document.createElement("button");
+  checkButton.textContent = "Check";
+  checkButton.classList.add("check-button");
+  taskBlock.appendChild(checkButton);
 
-    const modifyButton = document.createElement('button');
-    modifyButton.textContent('Modify');
-    modifyButton.classList.add('modify-button');
-    blockTask.appendChild(modifyButton);
+  const trashButton = document.createElement("button");
+  trashButton.textContent = "Trash";
+  trashButton.classList.add("trash-button");
+  taskBlock.appendChild(trashButton);
 
-    todoList.appendChild(blockTask);
-    todoInput.value = 0;
+  const modifyButton = document.createElement("button");
+  modifyButton.textContent = "Modify";
+  modifyButton.classList.add("modify-button");
+  taskBlock.appendChild(modifyButton);
+
+  todoList.appendChild(taskBlock);
+  todoInput.value = "";
+}
+
+function deleteModifyCheck(event) {
+  const item = event.target;
+  const todoItem = item.parentElement;
+
+  if (item.classList.contains("check-button")) {
+    todoItem.classList.toggle("completed");
+  }
+
+  if (item.classList.contains("trash-button")) {
+    todoItem.classList.add("fall");
+    todoItem.addEventListener("transitionend", function () {
+      todoItem.remove();
+    });
+  }
+
+  if (item.classList.contains("modify-button")) {
+    const oldText = todoItem.querySelector("li");
+
+    const newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.value = oldText.textContent;
+    newInput.classList.add("todo-input");
+
+    todoItem.replaceChild(newInput, oldText);
+
+    const saveButton = document.createElement("button");
+    saveButton.textContent = "Save";
+    saveButton.classList.add("save-button");
+    todoItem.appendChild(saveButton);
+
+    saveButton.addEventListener("click", function () {
+      const newText = newInput.value.trim();
+      if (newText !== "") {
+        oldText.textContent = newText;
+        todoItem.replaceChild(oldText, newInput);
+        todoItem.removeChild(saveButton);
+      }
+    });
+  }
 }
